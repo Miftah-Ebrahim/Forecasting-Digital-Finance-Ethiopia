@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # General
 __pycache__/
 *.py[cod]
@@ -16,3 +17,9 @@ data/raw/*.xlsx
 # Ignore virtual env
 venv/
 .venv/
+=======
+venv/
+.venv/
+__pycache__/
+*.pyc
+>>>>>>> task-2
