@@ -3,30 +3,33 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![Streamlit](https://img.shields.io/badge/streamlit-1.32.0-red.svg)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 
 ## Executive Summary
 
 **EthioPulse** is the flagship forecasting engine developed by the **Selam Analytics Consortium** to power the National Bank of Ethiopia's "Digital Ethiopia 2025" strategy. Our mission is to provide a rigorous, data-driven roadmap to achieve **60% financial inclusion** by predicting the impact of policy interventions and infrastructure scaling.
 
 ### The Growth Slowdown Paradox
-Despite a surge in digital accounts to **65 Million** (driven by Telebirr registration), **Global Findex** ownership data has only grown by **+3 percentage points** in real terms. EthioPulse addresses this discrepancy by distinguishing between *registered* accounts and *active* usage, revealing that while access has skyrocketed, meaningful adoption lags due to specific friction points in the P2P and merchant networks.
+Despite a surge in digital accounts to **65 Million** (driven by Telebirr registration), **Global Findex** ownership data has only grown by **+3 percentage points** in real terms (2021-2024). EthioPulse addresses this using an Event-Augmented model to bridge the "Access vs Usage" gap.
 
 ---
 
-## The Unified Data Engine (Schema v2)
+## Key Analytical Components
 
-Our architecture is built on a bias-resistant Unified Schema that decouples raw events from their statistical impacts.
+### 1. [Enrichment Log](reports/data_enrichment_log.md)
+*   **Methodology**: Hard-coded addition of 2024 NBE policy records and 4G coverage statistics.
+*   **Key Source**: Ethio Telecom 2024 Report (51% 4G Coverage).
 
-### Anti-Bias Architecture
-We separate **Neutral Events** (e.g., "Telecom Liberalization") from **Impact Links** (the statistical coefficient of change). This ensures events are not pre-assigned to pillars, allowing our model to dynamically discover relationships (e.g., a "Telecom" event affecting "Data Affordability" rather than just "Connectivity").
+### 2. [Comprehensive EDA](notebooks/01_eda_comprehensive.ipynb)
+*   **The Slowdown Investigation**: Analysis of the divergence between Mobile Money Registrations (explosive growth) and Findex Ownership (stagnant).
+*   **Event Overlay**: Timeline visualization showing the lag between policy launch and statistical impact.
 
-### The Relational Web
-| Parent Event (Event ID) | Event Description | Linked Indicator (Indicator Code) | Impact Mechanism |
-| :--- | :--- | :--- | :--- |
-| `EVT_0001` | Fayda Digital ID Launch | `ACC_OWNERSHIP` | Lowers KYC Friction |
-| `EVT_0002` | Safaricom Market Entry | `AFF_DATA_COST` | Competition reduces price/GB |
-| `EVT_0003` | EthioPay Switch Live | `USG_P2P_COUNT` | Enables Interoperability |
+### 3. [Modeling & Forecasting](notebooks/02_modeling_forecasting.ipynb)
+*   **Impact Matrix**: Heatmap quantifying the effect of "Fayda ID" and "Liberalization" on Access logic.
+*   **Event-Augmented Forecast**: 2025-2027 projection comparing Baseline trend vs. Strategic Intervention scenarios (Optimistic).
+
+### 4. [Interactive Dashboard](dashboard/app.py)
+*   **Scenario Simulator**: Toggles for "Moderate" vs "Aggressive" policy intervention.
+*   **Forecast Visuals**: Real-time rendering of the 2027 inclusion targets.
 
 ---
 
@@ -37,76 +40,37 @@ We separate **Neutral Events** (e.g., "Telecom Liberalization") from **Impact Li
 ├── dashboard/
 │   └── app.py              # Interactive Streamlit Scenario Simulator
 ├── data/
-│   ├── raw/                # Secured Unified Data (Excel)
+│   ├── raw/                # Enriched Data (CSV + XLSX)
 │   └── processed/          # Cleaned CSVs for modeling
-├── models/
-│   └── forecast_engine.pkl # Serialized Event-Augmented Model
 ├── notebooks/
-│   ├── 01_exploration_eda.ipynb      # Trend Analysis & Anomaly Detection
-│   └── 02_impact_forecasting.ipynb   # ARIMA + Shock Modeling
+│   ├── 01_eda_comprehensive.ipynb    # YoY, Slowdown, Event Overlay
+│   └── 02_modeling_forecasting.ipynb # Impact Matrix & Forecasting
 ├── reports/
-│   └── figures/            # High-res output visuals
+│   ├── data_enrichment_log.md        # Documentation of enforced records
+│   └── figures/                      # High-res output visuals
 ├── src/
-│   ├── data_loader.py      # Schema v2 Ingestion Logic
-│   └── processing.py       # Time-series transformation
+│   └── data_loader.py      # Schema v2 Ingestion Logic
 └── README.md               # Technical Documentation
 ```
-
 ---
 
-## Analytical & Visual Showcasing
-
-### Visual 1: Event Overlay Timeline
-*Tracking entry points against usage growth.*
-![Event Timeline](reports/figures/event_timeline.png)
-
-### Visual 2: Event-Indicator Association Heatmap
-*Correlation matrix identifying strongest adoption drivers.*
-![Correlation Heatmap](reports/figures/indicator_correlation.png)
-
-### Visual 3: 2027 Access Projection
-*Projected growth with confidence intervals.*
-![Forecast Comparison](reports/figures/forecast_with_ci.png)
-
-### Key Findings
-*   **Infrastructure Lead**: 4G Coverage (`ACC_4G_COVERAGE`) leads actual Usage (`USG_DIGITAL_PAYMENT`) by 1.5 years, indicating an infrastructure surplus waiting for adoption.
-*   **Cost Elasticity**: `AFF_DATA_COST` reduction correlates (-0.82) strongly with `ACC_OWNERSHIP` spikes.
-*   **Identity Catalyst**: The "Fayda" rollout is the single largest projected shock, estimated to contribute **+12%** to inclusion by 2027.
-*   **Gender Gap Persistence**: Despite overall growth, `GEN_GAP_ACC` remains steady, requiring targeted policy intervention.
-
----
-
-## Advanced Technical Documentation
-
-### Modeling Methodology: Event-Augmented Time Series
-We utilize a hybrid approach combining **ARIMA** for baseline trend extraction and a **Discrete Shock Model** for event impact. To handle sparse data (only 5 Findex points), we apply **Lag-Adjusted Coefficients** derived from our Impact Links.
-*   **Base Trend**: `Y_t = \alpha + \beta t + \epsilon`
-*   **Shock Component**: `S_t = \sum (Impact_i * Decay(t - t_event))`
-*   **Final Forecast**: `Y_{final} = Y_{base} + S_t`
-
-### The Interactive Dashboard
-*   **Scenario Simulator**: Stakeholders can toggle "Optimistic" vs "Base" scenarios (e.g., "What if Safaricom reaches 50% share by 2026?").
-*   **P2P vs ATM Crossover**: We track the ratio of P2P transfers to Cash Withdrawals. A ratio > 1.0 signals the transition to a "Cash-Lite" economy (Ethiopia predicted to cross in Q3 2026).
+## Key Insights
+1.  **Paradox of Plenty**: Infrastructure (4G ~51%) exceeds Adoption (Ownership ~49%), indicating an "Usage Gap" rather than coverage gap.
+2.  **Policy Lag**: Major events like Telebirr Launch show a 12-18 month lag before impacting Findex metrics significantly.
+3.  **Future Catalyst**: The new **Fayda Digital ID** is the un-captured shock projected to drive the next wave of *verified* ownership (+5-7% boost).
 
 ---
 
 ## Setup & Deployment
-
-### Quick Start
 ```bash
-# Clone the repository
+# Clone
 git clone https://github.com/SelamAnalytics/EthioPulse.git
 
-# Initialize Virtual Environment
-python -m venv venv
-.\venv\Scripts\activate
-
-# Install Dependencies
+# Install
 pip install -r requirements.txt
+
+# Run Dashboard
+streamlit run dashboard/app.py
 ```
 
-### Continuous Integration
-This project uses **GitHub Actions** (`unittests.yml`) to validate schema integrity and model convergence on every push.
-
----
-*Selam Analytics Consortium - Confidential & Proprietary*
+*Selam Analytics Consortium*
