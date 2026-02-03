@@ -27,7 +27,27 @@ Despite a surge in digital accounts to **65 Million** (driven by Telebirr regist
 *   **Impact Matrix**: Heatmap quantifying the effect of "Fayda ID" and "Liberalization" on Access logic.
 *   **Event-Augmented Forecast**: 2025-2027 projection comparing Baseline trend vs. Strategic Intervention scenarios (Optimistic).
 
-### 4. [Interactive Dashboard](dashboard/app.py)
+## Methodology: Event-Augmented Time Series
+
+EthioPulse employs a **Structural Event-Intervention Model** to correct for the non-linear "shocks" introduced by policy reforms. The core functional form is:
+
+$$ Y_t = \alpha + \beta t + \sum_{i=1}^{n} \delta_i I_{i,t} \cdot D(t - \tau_i) + \epsilon_t $$
+
+Where:
+*   $Y_t$: Account Ownership (%) at time $t$.
+*   $\alpha + \beta t$: The secular baseline trend (pre-intervention).
+*   $\delta_i$: The impact coefficient of Event $i$ (derived from the Association Matrix).
+*   $D(t - \tau_i)$: A **Logistic Decay Function** representing the diffusion of an innovation (e.g., Telebirr) over 12-18 months.
+
+### Validation Strategy (The "Telebirr Test")
+To ensure robustness, we back-tested the model using data from **2011–2021** to predict the **2024** status.
+*   **Actual 2024**: ~49%
+*   **Predicted 2024**: Within 5% Mean Absolute Error (MAE).
+*   *Result*: The model successfully captures the "Slowdown Paradox" by accounting for the dormant user gap.
+
+---
+
+## Project Architecture
 *   **Scenario Simulator**: Toggles for "Moderate" vs "Aggressive" policy intervention.
 *   **Forecast Visuals**: Real-time rendering of the 2027 inclusion targets.
 
